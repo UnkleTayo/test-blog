@@ -1,24 +1,24 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
-
+const bcryptSalt = process.env.BCRYPT_SALT
 const Schema = mongoose.Schema;
 
 const userSchema =  mongoose.Schema({
   firstName: {
     type: Schema.Types.String,
-    required: [true, "Can't be blank"],
+    required: [true, "first name is required"],
     trim: true,
     maxlength: 100
   },
   lastName: {
     type: Schema.Types.String,
-    required: [true, "Can't be blank"],
+    required: [true, "Last Name is required"],
     trim: true,
     maxlength: 100
   },
   email: {
     type: Schema.Types.String,
-    required: [true, "Can't be blank"],
+    required: [true, "Email is required"],
     unique: true,
     trim: true,
     select: false
@@ -26,7 +26,7 @@ const userSchema =  mongoose.Schema({
   password: {
     type: Schema.Types.String,
     select: false,
-    required: [true, "Can't be blank"],
+    required: [true, "Password is required"],
   },
   profilePicUrl: {
     type: Schema.Types.String,
@@ -42,22 +42,25 @@ const userSchema =  mongoose.Schema({
   }
 }, {timeStamps: true})
 
-userSchema.methods.setPassword = async function (password){
-  const processing = await bcrypt.hash(password, 12);
-  return hashedPassword = await processing;
-}
+
 
 userSchema.pre('save', async function(next) {
     // check to see if password is modified 
     if(!this.isModified("password")){
       next()
     }
-    const processing = await bcrypt.hash(this.password, 12);
-    this.password= await processing;
+    const hash = await bcrypt.hash(this.password, Number(bcryptSalt));
+    this.password= await hash;
+    next()
 })
 
-userSchema.methods.validatePassword = async  function(newPassword){
-  return await bcrypt.compare(newPassword,this.password);
+userSchema.methods.matchPassword = async  function(newPassword){
+  try{
+    return await bcrypt.compare(newPassword,this.password);
+  }
+  catch(err){
+    console.err(err)
+  }
 }
 
 
@@ -65,15 +68,3 @@ userSchema.methods.validatePassword = async  function(newPassword){
 
 export const UserModel = mongoose.model('User', userSchema)
 
-  
-// import mongoose from "mongoose";
-
-// const userSchema = mongoose.Schema({
-//   firstName: { type: String, required:  true },
-//   lastName: { type: String, required:  true },
-//   email: { type: String, required: true },
-//   password: { type: String, required: true },
-//   id: { type: String },
-// });
-
-// export const UserModel = mongoose.model('User', userSchema)
