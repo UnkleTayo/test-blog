@@ -39,7 +39,14 @@ const userSchema =  mongoose.Schema({
   status: {
     type: Schema.Types.Boolean,
     default: true,
-  }
+  },
+  createdAt:{
+    type: Schema.Types.Date,
+  },
+  updatedAt:{
+    type: Schema.Types.Date,
+  },
+  
 }, {timeStamps: true})
 
 

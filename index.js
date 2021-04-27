@@ -3,7 +3,7 @@ import helmet from 'helmet'
 import dotenv from 'dotenv'
 import logger from 'morgan'
 import { connectDB } from './db/connectDB.js'
-import authRoute from './src/routers/authRoute.js'
+import authRoute from './routers/authRoute.js'
 
 dotenv.config()
 

@@ -45,7 +45,8 @@ export const signup = async (req, res) => {
       firstName,
       lastName,
       email,
-      password
+      password,
+      createdAt: new Date().toISOString()
     });
 
     const token = generateToken({ email: result.email, id: result._id })
