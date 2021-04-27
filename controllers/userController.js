@@ -1,19 +1,13 @@
-import crypto from 'crypto'
-
-import { TokenModel } from '../models/tokenModel.js';
-import { UserModel } from '../models/userModel.js';
-import generateToken from '../utils/generateToken.js';
+const expressAsyncHandler = require('express-async-handler');
+const { User } = require('../models/userModel')
+const {generateToken} = require('../utils/generateToken')
 
 
-const bcryptSalt = process.env.BCRYPT_SALT
-
-const secret = process.env.JWT_SECRET;
-
-export const signin = async (req, res) => {
+exports.login = expressAsyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const existingUser = await UserModel.findOne({ email });
+    const existingUser = await User.findOne({ email });
 
     if (!existingUser)
       return res.status(404).json({ message: "User doesn't exist" });
@@ -30,18 +24,18 @@ export const signin = async (req, res) => {
     console.error(err)
     res.status(500).json({ message: 'Something went wrong' });
   }
-};
+});
 
-export const signup = async (req, res) => {
+exports.signup =  expressAsyncHandler(async (req, res) => {
   const { email, password, firstName, lastName} = req.body;
 
   try {
-    const existingUser = await UserModel.findOne({ email });
+    const existingUser = await User.findOne({ email });
 
     if (existingUser)
       return res.status(400).json({ message: 'User already exists' });
 
-    const result = await UserModel.create({
+    const result = await User.create({
       firstName,
       lastName,
       email,
@@ -57,7 +51,7 @@ export const signup = async (req, res) => {
 
     console.log(error);
   }
-};
+})
 
 // export const requestPassowrdReset = async (req, res) => {
 //   const {email} = req.body;

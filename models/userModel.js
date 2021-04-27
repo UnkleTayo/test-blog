@@ -1,5 +1,7 @@
-import mongoose from 'mongoose'
-import bcrypt from 'bcrypt'
+const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+
+
 const bcryptSalt = process.env.BCRYPT_SALT
 const Schema = mongoose.Schema;
 
@@ -70,8 +72,7 @@ userSchema.methods.matchPassword = async  function(newPassword){
   }
 }
 
+const User = mongoose.model('User', userSchema)
+module.exports = User;
 
-
-
-export const UserModel = mongoose.model('User', userSchema)
 

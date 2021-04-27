@@ -1,16 +1,16 @@
-import jwt from 'jsonwebtoken';
-import expressAsyncHandler from 'express-async-handler';
-import { UserModel } from '../models/userModel';
+const jwt  = require('jsonwebtoken');
+const expressAsyncHandler  = require('express-async-handler');
 
-export const protect = expressAsyncHandler(async (req, res, next) => {
+exports.protect = expressAsyncHandler(async (req, res, next) => {
   let token;
 
   const headerParam = req.headers.authorization;
   if (headerParam && headerParam.startsWith('Bearer')) {
     try {
       token = headerParam.split(' ')[1];
-      const decode = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await UserModel.findById(decode.id).select('-password');
+      const decodeData = jwt.verify(token, process.env.JWT_SECRET);
+      req.userId = decodeData?.email?.id
+      console.log("Id",req.userId)
       next();
     } catch (error) {
       console.error(error);
