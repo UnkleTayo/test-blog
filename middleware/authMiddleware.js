@@ -7,8 +7,8 @@ exports.protect = expressAsyncHandler(async (req, res, next) => {
   const headerParam = req.headers.authorization;
   if (headerParam && headerParam.startsWith('Bearer')) {
     token = headerParam.split(' ')[1];
-    const decodeData = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decodeData?.id?.id;
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decodedData?.id?.id;
     next();
   }
 

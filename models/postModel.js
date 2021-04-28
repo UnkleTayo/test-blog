@@ -1,19 +1,15 @@
 const mongoose = require('mongoose');
+const { titleToSlug } = require('../utils/urlSlug');
 
 const Schema = mongoose.Schema;
 
-const blogSchema = mongoose.Schema({
-  author: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    index: true,
-  },
+const postSchema = mongoose.Schema({
   title: {
     type: Schema.Types.String,
     required: true,
     maxlength: 300,
     trim: true,
+    unique: true,
   },
   metaTitle: {
     type: Schema.Types.String,
@@ -40,17 +36,23 @@ const blogSchema = mongoose.Schema({
       uppercase: true,
     },
   ],
-  likes: {
-    type: Schema.Types.Number,
-    default: 0,
+  likes: [mongoose.Schema.Types.ObjectId],
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
+    },
+  ],
+  status: {
+    type: String,
+    enum: ['draft', 'published'],
+    default: 'draft',
   },
-  isSubmitted: {
-    type: Schema.Types.Boolean,
-    default: false,
-  },
-  isDraft: {
-    type: Schema.Types.Boolean,
-    default: true,
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    select: false,
+    index: true,
   },
   isPublished: {
     type: Schema.Types.Boolean,
@@ -60,25 +62,20 @@ const blogSchema = mongoose.Schema({
     type: Schema.Types.Date,
     required: false,
   },
-  createdBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    select: false,
-    index: true,
-  },
-  updatedBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    select: false,
-  },
   createdAt: {
     type: Date,
-    default: Date.now(),
+    default: Date,
   },
   updatedAt: {
     type: Date,
   },
 });
 
-const Blog = mongoose.model('Blog', blogSchema);
-module.exports = Blog;
+const Post = mongoose.model('Post', postSchema);
+
+postSchema.pre('save', function (next) {
+  this.slug = titleToSlug(this.slug);
+  next();
+});
+
+module.exports = Post;

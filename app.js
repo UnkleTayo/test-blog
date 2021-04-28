@@ -2,8 +2,8 @@ const express = require('express');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
-const authRoute = require('./routes/userRoutes.js');
-const postRoute = require('./routes/postRoute.js');
+const authRoute = require('./routes/authRoutes.js');
+const postRoute = require('./routes/postRoutes.js');
 const AppError = require('./utils/appErrorHandler.js');
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -24,8 +24,8 @@ app.use(function (req, res, next) {
 });
 
 // loading Routes
-app.use('/api/v1/user', authRoute);
-app.use('/api/v1/blog', postRoute);
+app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/post', postRoute);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

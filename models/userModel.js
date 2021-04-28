@@ -51,10 +51,6 @@ const userSchema = mongoose.Schema(
       default: false,
       select: false,
     },
-    status: {
-      type: Schema.Types.Boolean,
-      default: true,
-    },
     registeredAt: {
       type: Schema.Types.Date,
     },
@@ -69,16 +65,24 @@ const userSchema = mongoose.Schema(
       type: Schema.Types.String,
       maxlength: 500,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-    },
     updatedAt: {
       type: Date,
     },
+    Posts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post',
+      },
+    ],
   },
-  { timeStamps: true }
+  { timeStamps: true, toJSON: { virtuals: true } }
 );
+
+userSchema.virtual('posts', {
+  ref: 'Post',
+  foreignField: 'author',
+  localField: '_id',
+});
 
 userSchema.pre('save', async function (next) {
   // check to see if password is modified

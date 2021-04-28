@@ -3,39 +3,24 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const commentSchema = mongoose.Schema({
-  postID: {
-    type: Schema.Types.ObjectId,
-    ref: 'Post',
-    required: true,
-    index: true,
-  },
   content: {
     type: Schema.Types.String,
     maxlength: 500,
     trim: true,
   },
-  likes: {
-    type: Schema.Types.Number,
-    default: 0,
-  },
-  isPublished: {
-    type: Schema.Types.Boolean,
-    default: false,
-  },
-  createdBy: {
-    type: Schema.Types.ObjectId,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    select: false,
-    index: true,
+    required: true,
   },
-  updatedBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    select: false,
+  blog: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Blog',
+    required: true,
   },
   createdAt: {
     type: Date,
-    default: new Date(),
+    default: Date,
   },
   updatedAt: {
     type: Date,
