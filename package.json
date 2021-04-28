@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server"
+    "dev": "nodemon server",
+    "start:prod": "NODE_ENV=production node server",
+    "debug": "ndb server"
   },
   "keywords": [],
   "author": "",
@@ -22,10 +24,13 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.5",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.5.0"
+    "nodemailer": "^6.5.0",
+    "slugify": "^1.5.0",
+    "validator": "^13.6.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
+    "ndb": "^1.1.5",
     "nodemon": "^2.0.7"
   }
 }
