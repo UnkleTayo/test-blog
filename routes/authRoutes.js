@@ -11,8 +11,8 @@ router.post('/login', [
   authController.login,
 ]);
 
-router.post('/forgotPassword', authController.forgotPassword);
+router.post('/forgot-password', authController.forgotPassword);
 
-router.patch('/resetPassword/:token', authController.resetPassword);
+router.patch('/reset-password/:token', authController.resetPassword);
 router.post('/:id/lists', authController.getUserPost);
 module.exports = router;

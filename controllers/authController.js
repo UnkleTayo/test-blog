@@ -57,7 +57,7 @@ exports.getUserPost = expressAsyncHandler(async (req, res, next) => {
   });
 });
 
-exports.forgotPassword = catchAsync(async (req, res, next) => {
+exports.forgotPassword = expressAsyncHandler(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -98,7 +98,37 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.resetPassword = (req, res, next) => {};
+exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
+  console.log(req.params);
+  // Get user based on token
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  // if token has not expired and there is a user set the new password
+  if (!user) {
+    return next(new AppError('Token is invalid or has expired', 400));
+  }
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  // update changePasswordAt property for the user
+
+  // log the user in
+  const token = generateToken(user._id);
+
+  res.status(201).json({ status: 'success', token });
+});
+
 // export const requestPassowrdReset = async (req, res) => {
 //   const {email} = req.body;
 
