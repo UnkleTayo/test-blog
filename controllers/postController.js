@@ -8,7 +8,7 @@ exports.createPost = expressAsyncHandler(async (req, res, next) => {
 
   const post = await Post.create({
     ...postData,
-    author: req.userId,
+    author: req.user._id,
     createdAt: Date.now(),
   });
   res.status(201).json({

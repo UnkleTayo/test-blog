@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
@@ -66,7 +67,16 @@ const userSchema = mongoose.Schema(
       maxlength: 500,
     },
     updatedAt: {
-      type: Date,
+      type: Schema.Types.Date,
+    },
+    passwordChangedAt: {
+      type: Schema.Types.Date,
+    },
+    passwordResetToken: {
+      type: Schema.Types.String,
+    },
+    passwordResetExpires: {
+      type: Schema.Types.Date,
     },
     Posts: [
       {
@@ -92,6 +102,7 @@ userSchema.pre('save', async function (next) {
   const hash = await bcrypt.hash(this.password, Number(bcryptSalt));
   this.password = await hash;
 
+  // This will remove password confirm from what we send to the database
   this.passwordConfirm = undefined;
   next();
 });
@@ -102,6 +113,30 @@ userSchema.methods.matchPassword = async function (newPassword) {
   } catch (err) {
     console.error(err);
   }
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = +(this.passwordChangedAt.getTime() / 1000);
+    console.log(changedTimestamp, JWTTimestamp);
+  }
+
+  return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(12).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  console.log(resetToken, 'Password reset token', this.passwordResetToken);
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);

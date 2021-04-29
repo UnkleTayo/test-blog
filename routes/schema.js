@@ -22,7 +22,12 @@ exports.validateMiddleware = (validator) => {
   return (req, res, next) => {
     const { error } = validator(req.body);
     if (error) {
-      return new AppError(error.details[0].message, 400);
+      const message = error.details[0].message;
+      // return res.status(400).json({
+      //   status: 'fail',
+      //   message: error.details[0].message,
+      // });
+      return next(new AppError(`${message}`, 404));
     }
     next();
   };

@@ -19,7 +19,7 @@ app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(function (req, res, next) {
-  console.log(req.headers);
+  // console.log(req.headers);
   next();
 });
 
