@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const AppError = require('../utils/appErrorHandler');
+const AppError = require('./appErrorHandler');
 
 const personID = Joi.string().guid({ version: 'uuidv4' });
 // for editing password

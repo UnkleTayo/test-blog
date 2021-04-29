@@ -4,6 +4,7 @@ const morgan = require('morgan');
 
 const authRoute = require('./routes/authRoutes.js');
 const postRoute = require('./routes/postRoutes.js');
+const userRoute = require('./routes/userRoutes.js');
 const AppError = require('./utils/appErrorHandler.js');
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -25,6 +26,7 @@ app.use(function (req, res, next) {
 
 // loading Routes
 app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/user', userRoute);
 app.use('/api/v1/post', postRoute);
 
 app.all('*', (req, res, next) => {
