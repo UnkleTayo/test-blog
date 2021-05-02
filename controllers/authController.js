@@ -1,26 +1,17 @@
+const crypto = require('crypto');
 const expressAsyncHandler = require('express-async-handler');
-
 const User = require('../models/userModel');
 const AppError = require('../utils/appErrorHandler');
 const sendEmail = require('../utils/email');
 const generateToken = require('../utils/generateToken');
 
-exports.login = expressAsyncHandler(async (req, res, next) => {
-  const { email, password } = req.body;
+const createSendToken = (user, statusCode, res) => {
+   // log the user in
+   const token = generateToken(user._id);
 
-  const existingUser = await User.findOne({ email }).select('+password');
+   res.status(statusCode).json({ status: 'success', token, data: {user} });
+}
 
-  if (!existingUser) return next(new AppError('User does not exist', 404));
-
-  const isPasswordCorrect =
-    existingUser && (await existingUser.matchPassword(password));
-
-  if (!isPasswordCorrect) return next(new AppError('Incorrect password', 401));
-
-  const token = generateToken(existingUser._id);
-
-  res.status(200).json({ message: 'success', token });
-});
 
 exports.signup = expressAsyncHandler(async (req, res, next) => {
   const { email, password, firstName, lastName, passwordConfirm } = req.body;
@@ -42,10 +33,28 @@ exports.signup = expressAsyncHandler(async (req, res, next) => {
     registeredAt: new Date().toISOString(),
   });
 
-  const token = generateToken(newUser._id);
 
-  res.status(201).json({ status: 'success', token, data: { user: newUser } });
+  createSendToken(newUser, 201, res)
 });
+
+
+exports.login = expressAsyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  const existingUser = await User.findOne({ email }).select('+password');
+
+  if (!existingUser) return next(new AppError('User does not exist', 404));
+
+  const isPasswordCorrect =
+    existingUser && (await existingUser.matchPassword(password));
+
+  if (!isPasswordCorrect) return next(new AppError('Incorrect password', 401));
+
+  const token = generateToken(existingUser._id);
+
+  res.status(200).json({ message: 'success', token });
+});
+
 
 exports.getUserPost = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.params;
@@ -99,7 +108,6 @@ exports.forgotPassword = expressAsyncHandler(async (req, res, next) => {
 });
 
 exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
-  console.log(req.params);
   // Get user based on token
   const hashedToken = crypto
     .createHash('sha256')
@@ -131,19 +139,19 @@ exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
 exports.updatePassword = expressAsyncHandler(async (req, res, next) => {
   // 1) Get user from collection
   const user = await User.findById(req.user.id).select('+password');
+  console.log(user)
+  // // 2) Check if POSTed current password is correct
+  // if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+  //   return next(new AppError('Your current password is wrong.', 401));
+  // }
 
-  // 2) Check if POSTed current password is correct
-  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
-    return next(new AppError('Your current password is wrong.', 401));
-  }
+  // // 3) If so, update password
+  // user.password = req.body.password;
+  // user.passwordConfirm = req.body.passwordConfirm;
+  // await user.save();
+  // // User.findByIdAndUpdate will NOT work as intended!
 
-  // 3) If so, update password
-  user.password = req.body.password;
-  user.passwordConfirm = req.body.passwordConfirm;
-  await user.save();
-  // User.findByIdAndUpdate will NOT work as intended!
-
-  // 4) Log user in, send JWT
+  // // 4) Log user in, send JWT
   // createSendToken(user, 200, res);
 });
 

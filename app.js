@@ -15,19 +15,25 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+
+
 app.use(express.json());
 app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(function (req, res, next) {
   // console.log(req.headers);
+  // console.log(process.env.APP_VERSION)
   next();
 });
 
 // loading Routes
-app.use('/api/v1/auth', authRoute);
-app.use('/api/v1/user', userRoute);
-app.use('/api/v1/post', postRoute);
+// app.use('/api/v1/auth', authRoute);
+app.use(`/${process.env.APP_VERSION}/auth`, authRoute);
+app.use(`/${process.env.APP_VERSION}/user`, userRoute);
+app.use(`/${process.env.APP_VERSION}/post`, postRoute);
+// app.use('/api/v1/user', userRoute);
+// app.use('/api/v1/post', postRoute);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
