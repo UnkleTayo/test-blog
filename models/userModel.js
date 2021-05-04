@@ -66,8 +66,10 @@ const userSchema = mongoose.Schema(
       type: Schema.Types.String,
       maxlength: 500,
     },
-    updatedAt: {
-      type: Schema.Types.Date,
+    role: {
+      type: Schema.Types.String,
+      enum: ['user', 'writer', 'admin'],
+      default: 'user',
     },
     passwordChangedAt: {
       type: Schema.Types.Date,
@@ -84,6 +86,9 @@ const userSchema = mongoose.Schema(
         ref: 'Post',
       },
     ],
+    updatedAt: {
+      type: Schema.Types.Date,
+    },
   },
   { timeStamps: true, toJSON: { virtuals: true } }
 );
@@ -127,7 +132,7 @@ userSchema.methods.matchPassword = async function (newPassword) {
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = +(this.passwordChangedAt.getTime() / 1000);
-    console.log(changedTimestamp, JWTTimestamp);
+    // console.log(changedTimestamp, JWTTimestamp);
   }
 
   return false;
@@ -141,14 +146,14 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  console.log(resetToken, 'Password reset token', this.passwordResetToken);
+  // console.log(resetToken, 'Password reset token', this.passwordResetToken);
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
 };
 
-userSchema.methods.correctPassword = async function(
+userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {

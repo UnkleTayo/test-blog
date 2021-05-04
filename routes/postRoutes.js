@@ -1,7 +1,7 @@
 const express = require('express');
 const postController = require('../controllers/postController');
 
-const { protect } = require('../middleware/authMiddleware');
+const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -11,8 +11,8 @@ router.route('/').get(postController.getAllPosts);
 router
   .route('/:id')
   .get(postController.getPost)
-  .patch(postController.updatePost)
-  .delete(postController.deletePost);
+  .patch(protect, postController.updatePost)
+  .delete(protect, restrictTo('writer', 'admin'), postController.deletePost);
 
 router.route('/new').post(protect, postController.createPost);
 

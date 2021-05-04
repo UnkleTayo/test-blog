@@ -35,3 +35,16 @@ exports.protect = expressAsyncHandler(async (req, res, next) => {
     next();
   }
 });
+
+exports.restrictTo = (...roles) => {
+  return expressAsyncHandler(async (req, res, next) => {
+    // roles is an array
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You are not permitted to perform this action', 403)
+      );
+    }
+
+    next();
+  });
+};

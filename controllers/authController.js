@@ -6,12 +6,11 @@ const sendEmail = require('../utils/email');
 const generateToken = require('../utils/generateToken');
 
 const createSendToken = (user, statusCode, res) => {
-   // log the user in
-   const token = generateToken(user._id);
+  // log the user in
+  const token = generateToken(user._id);
 
-   res.status(statusCode).json({ status: 'success', token, data: {user} });
-}
-
+  res.status(statusCode).json({ status: 'success', token, data: { user } });
+};
 
 exports.signup = expressAsyncHandler(async (req, res, next) => {
   const { email, password, firstName, lastName, passwordConfirm } = req.body;
@@ -33,10 +32,8 @@ exports.signup = expressAsyncHandler(async (req, res, next) => {
     registeredAt: new Date().toISOString(),
   });
 
-
-  createSendToken(newUser, 201, res)
+  createSendToken(newUser, 201, res);
 });
-
 
 exports.login = expressAsyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
@@ -54,7 +51,6 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
 
   res.status(200).json({ message: 'success', token });
 });
-
 
 exports.getUserPost = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.params;
@@ -124,7 +120,7 @@ exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
     return next(new AppError('Token is invalid or has expired', 400));
   }
   user.password = req.body.password;
-  user.passwordConfirm = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   // update changePasswordAt property for the user
@@ -139,7 +135,7 @@ exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
 exports.updatePassword = expressAsyncHandler(async (req, res, next) => {
   // 1) Get user from collection
   const user = await User.findById(req.user.id).select('+password');
-  console.log(user)
+  console.log(user);
   // // 2) Check if POSTed current password is correct
   // if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
   //   return next(new AppError('Your current password is wrong.', 401));

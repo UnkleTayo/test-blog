@@ -1,30 +1,25 @@
 const nodemailer = require('nodemailer');
 
-const sendEmail = async (options) => {
+const sendEmail = async (option) => {
+  console.log(option);
   // create a transporter
-  // const transporter = nodemailer.createTransport({
-  //   // Activate less secure App for email
-  //   host: process.env.EMAIL_HOST,
-  //   port: process.env.EMAIL_PORT,
-  //   auth: {
-  //     user: process.env.EMAIL_USERNAME,
-  //     password: process.env.EMAIL_PASSWORD,
-  //   },
-  // });
-
   const transporter = nodemailer.createTransport({
-    host: 'smtp.mailtrap.io',
-    port: 2525,
+    // Activate less secure App for email
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
     auth: {
-      user: 'd46ab3105bdb46',
-      pass: 'e00288a3276b3f',
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
     },
   });
+
   // defined the email options
   const mailOptions = {
     from: 'Adetayo Akinsanya <hello@pandablog.io>',
     to: option.email,
-    text: options.message,
+    subject: option.subject,
+    html: option.message,
+    // html: option.message,
   };
   // Send the email with nodemailer
   await transporter.sendMail(mailOptions);
