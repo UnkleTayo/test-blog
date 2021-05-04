@@ -88,6 +88,12 @@ const userSchema = mongoose.Schema(
     ],
     updatedAt: {
       type: Schema.Types.Date,
+      select: false,
+    },
+    active: {
+      type: Schema.Types.Boolean,
+      default: true,
+      select: false,
     },
   },
   { timeStamps: true, toJSON: { virtuals: true } }
@@ -118,6 +124,12 @@ userSchema.pre('save', function (next) {
   }
 
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  // points to current query
+  this.find({ active: { $ne: false } });
   next();
 });
 
