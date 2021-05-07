@@ -2,6 +2,8 @@ const express = require('express');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 const authRoute = require('./routes/authRoutes.js');
 const postRoute = require('./routes/postRoutes.js');
@@ -25,6 +27,11 @@ app.use(helmet());
 // Body parser middleware
 app.use(express.json({ limit: '10kb' }));
 
+// Data sanitizarion against Nosql injection
+app.use(mongoSanitize());
+
+// Data sanitization aains xss
+app.use(xss());
 // Prod logging
 if (process.env.NODE_ENV === 'production') {
   app.use('/api', limiter);
@@ -48,7 +55,6 @@ app.use(function (req, res, next) {
 app.use(`/${appVersion}/auth`, authRoute);
 app.use(`/${appVersion}/user`, userRoute);
 app.use(`/${appVersion}/post`, postRoute);
-
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
