@@ -69,7 +69,7 @@ exports.forgotPassword = expressAsyncHandler(async (req, res, next) => {
     'host'
   )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: <a href='${resetURL}'>Here</a>.\nIf you didn't forget your password, please ignore this email!`;
 
   try {
     await sendEmail({
@@ -139,23 +139,3 @@ exports.updatePassword = expressAsyncHandler(async (req, res, next) => {
   // 4) Log user in, send JWT
   createSendToken(user, 200, res);
 });
-
-// export const requestPassowrdReset = async (req, res) => {
-//   const {email} = req.body;
-
-//   const existingUser = await UserModel.f indOne({email});
-//   if (!existingUser) return res.status(404).json({ message: "User doesn't exist" });
-
-//   let token = await TokenModel.findOne({userId: existingUser._id})
-//   if(token) await token.deleteOne();
-//   let resetToken = crypto.randomBytes(32).toString("hex")
-//   const hash = await bcrypt.hash(resetToken,Number(bcryptSalt))
-
-//   const newToken = await TokenModel.create({
-//     userId: existingUser._id,
-//     token: hash,
-//     createdAt: Date.now()
-//   })
-
-//   const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`;
-// }

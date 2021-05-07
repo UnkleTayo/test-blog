@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 
 const sendEmail = async (option) => {
-  console.log(option);
   // create a transporter
   const transporter = nodemailer.createTransport({
     // Activate less secure App for email
