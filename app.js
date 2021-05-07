@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const authRoute = require('./routes/authRoutes.js');
 const postRoute = require('./routes/postRoutes.js');
@@ -42,6 +43,13 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+app.use(
+  hpp({
+    whitelist: ['duration, price, list'],
+  })
+);
+
+app.use(hpp());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(function (req, res, next) {
