@@ -11,23 +11,30 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
-//Middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 50, // limit each IP to 100 requests per windowMs
+  messages: 'Too many request from this Ip, please try again in an hour',
 });
-
-if (process.env.NODE_ENV === 'production') {
-  app.use(limiter);
-}
 
 const appVersion = process.env.APP_VERSION;
 
-app.use(express.json());
+// Set HTTP Headers
 app.use(helmet());
+
+// Body parser middleware
+app.use(express.json({ limit: '10kb' }));
+
+// Prod logging
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api', limiter);
+}
+
+//Dev logging Middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
 app.use(express.urlencoded({ extended: false }));
 
 app.use(function (req, res, next) {
@@ -41,6 +48,7 @@ app.use(function (req, res, next) {
 app.use(`/${appVersion}/auth`, authRoute);
 app.use(`/${appVersion}/user`, userRoute);
 app.use(`/${appVersion}/post`, postRoute);
+
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
