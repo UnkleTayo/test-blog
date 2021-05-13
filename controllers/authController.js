@@ -43,16 +43,6 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
-exports.getUserPost = expressAsyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const result = await User.findById(id).populate('posts');
-
-  res.status(201).json({
-    message: 'success',
-    data: { post: result },
-  });
-});
-
 exports.forgotPassword = expressAsyncHandler(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });

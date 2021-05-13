@@ -80,30 +80,20 @@ const userSchema = mongoose.Schema(
     passwordResetExpires: {
       type: Schema.Types.Date,
     },
-    Posts: [
+    posts: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post',
       },
     ],
-    updatedAt: {
-      type: Schema.Types.Date,
-      select: false,
-    },
     active: {
       type: Schema.Types.Boolean,
       default: true,
       select: false,
     },
   },
-  { timeStamps: true, toJSON: { virtuals: true } }
+  { timeStamps: true }
 );
-
-userSchema.virtual('posts', {
-  ref: 'Post',
-  foreignField: 'author',
-  localField: '_id',
-});
 
 userSchema.pre('save', async function (next) {
   // check to see if password is modified

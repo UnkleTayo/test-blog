@@ -12,11 +12,13 @@ const filterObj = (obj, ...allowedFields) => {
 
 exports.getUserPost = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const result = await User.findById(id).populate('posts');
-
-  res.status(201).json({
+  const posts = await User.findById(id).populate('posts');
+  if (!posts) {
+    return next(new AppError('No post found with that  ID', 404));
+  }
+  res.status(200).json({
     message: 'success',
-    data: { post: result },
+    data: { posts },
   });
 });
 
@@ -41,9 +43,14 @@ exports.createUser = (req, res) => {
 };
 
 exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
+  const { id } = req.params;
+  const posts = await User.findById(id);
+  if (!posts) {
+    return next(new AppError('No post found with that  ID', 404));
+  }
+  res.status(200).json({
+    message: 'success',
+    data: { posts },
   });
 };
 
@@ -85,7 +92,7 @@ exports.updateMe = expressAsyncHandler(async (req, res, next) => {
   // 3) Update user document
   const updatedUser = await User.findByIdAndUpdate(
     req.user.id,
-    { ...filteredBody, updatedAt: Date.now() },
+    { ...filteredBody },
     {
       new: true,
       runValidators: true,

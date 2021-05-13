@@ -28,10 +28,10 @@ app.use(helmet());
 // Body parser middleware
 app.use(express.json({ limit: '10kb' }));
 
-// Data sanitizarion against Nosql injection
+// Data sanitization against Nosql injection
 app.use(mongoSanitize());
 
-// Data sanitization aains xss
+// Data sanitization against xss
 app.use(xss());
 // Prod logging
 if (process.env.NODE_ENV === 'production') {

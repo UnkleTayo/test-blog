@@ -8,8 +8,16 @@ router.patch('/updateMe', protect, userController.updateMe);
 router.delete('/deleteMe', protect, userController.deleteMe);
 router
   .route('/')
-  .get(userController.getAllUsers)
-  .post(userController.createUser);
+  .post(userController.createUser)
+  .get(userController.getUser)
+  .get(userController.getAllUsers);
+
+/**
+ * Route to get post by a single user
+ * Public
+ * api/v1/user/post
+ */
+router.get('/me/posts', userController.getUserPost);
 
 router
   .route('/:id')
