@@ -7,7 +7,7 @@ const generateToken = require('../utils/generateToken');
 const createSendToken = require('../utils/createSendToken');
 
 exports.signup = expressAsyncHandler(async (req, res, next) => {
-  const { email, password, firstName, lastName, passwordConfirm } = req.body;
+  const { email, password, firstName,  lastName, passwordConfirm} = req.body;
 
   const existingUser = await User.findOne({ email });
 
@@ -23,7 +23,7 @@ exports.signup = expressAsyncHandler(async (req, res, next) => {
     email,
     password,
     passwordConfirm,
-    registeredAt: new Date().toISOString(),
+    ...req.body
   });
 
   createSendToken(newUser, 201, res);
@@ -34,7 +34,7 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ email }).select('+password');
 
-  if (!user) return next(new AppError('User does not exist', 404));
+  if (!user) return next(new AppError('Wrong credentials', 404));
 
   const isPasswordCorrect = user && (await user.matchPassword(password));
 

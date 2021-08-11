@@ -12,7 +12,7 @@ createSendToken = (user, statusCode, res) => {
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
   res.cookie('jwt', token, cookieOptions);
   user.password = undefined;
-  res.status(statusCode).json({ status: 'success', token, data: { user } });
+  res.status(statusCode).json({ status: 'success', token, data: {user}  });
 };
 
 module.exports = createSendToken;

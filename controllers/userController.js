@@ -10,63 +10,66 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getUserPost = expressAsyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const posts = await User.findById(id).populate('posts');
-  if (!posts) {
-    return next(new AppError('No post found with that  ID', 404));
-  }
-  res.status(200).json({
-    message: 'success',
-    data: { posts },
-  });
-});
+/** 
+@Des  Get all users
+@route POST /api/v1/auth/users
+@access Private/admin
+*/
 
 exports.getAllUsers = expressAsyncHandler(async (req, res, next) => {
-  const users = await User.find();
-
+  const users = await User.find({});
   // SEND RESPONSE
   res.status(200).json({
     status: 'success',
     results: users.length,
-    data: {
-      users,
-    },
+    data: {users},
   });
 });
 
-exports.createUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-};
+/** 
+@Des  Create single user
+@route POST /api/v1/auth/users
+@access Private/admin
+*/
 
-exports.getUser = (req, res) => {
+exports.createUser = expressAsyncHandler(async (req, res, next) => {
+  const user = await User.create(req.body);
+
+  res.status(201).json({
+    success: true,
+    data: {user},
+  });
+});
+
+/** 
+@Des  Get single users
+@route POST /api/v1/auth/users/:id
+@access Private/admin
+*/
+exports.getUser = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
-  const posts = await User.findById(id);
-  if (!posts) {
+  const user = await User.findById(id);
+  if (!user) {
+    return next(new AppError('No User found with that  ID', 404));
+  }
+  res.status(200).json({
+    message: 'success',
+    data: {user} ,
+  });
+});
+
+
+exports.getUserPost = expressAsyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const user = await User.findById(id).populate('blogs');
+  if (!user) {
     return next(new AppError('No post found with that  ID', 404));
   }
   res.status(200).json({
     message: 'success',
-    data: { posts },
+    data: { user },
   });
-};
-
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-};
-
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-};
+});
 
 exports.updateMe = expressAsyncHandler(async (req, res, next) => {
   // create error if user posts password data
@@ -109,28 +112,8 @@ exports.updateMe = expressAsyncHandler(async (req, res, next) => {
 
 exports.deleteMe = expressAsyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
-  res.status(204).json({
+  res.status(200).json({
     status: 'success',
-    data: null,
+    data: {},
   });
 });
-
-// export const requestPassowrdReset = async (req, res) => {
-//   const {email} = req.body;
-
-//   const existingUser = await UserModel.f indOne({email});
-//   if (!existingUser) return res.status(404).json({ message: "User doesn't exist" });
-
-//   let token = await TokenModel.findOne({userId: existingUser._id})
-//   if(token) await token.deleteOne();
-//   let resetToken = crypto.randomBytes(32).toString("hex")
-//   const hash = await bcrypt.hash(resetToken,Number(bcryptSalt))
-
-//   const newToken = await TokenModel.create({
-//     userId: existingUser._id,
-//     token: hash,
-//     createdAt: Date.now()
-//   })
-
-//   const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`;
-// }

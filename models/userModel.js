@@ -8,9 +8,15 @@ const Schema = mongoose.Schema;
 
 const userSchema = mongoose.Schema(
   {
+    username: {
+      type: Schema.Types.String,
+      required: false,
+      trim: true,
+      unique: true
+    },
     firstName: {
       type: Schema.Types.String,
-      required: [true, 'first name is required'],
+      required: [true, 'First name is required'],
       trim: true,
     },
     lastName: {
@@ -46,14 +52,12 @@ const userSchema = mongoose.Schema(
       type: Schema.Types.String,
       trim: true,
       select: false,
+      default: ""
     },
     verified: {
       type: Schema.Types.Boolean,
       default: false,
       select: false,
-    },
-    registeredAt: {
-      type: Schema.Types.Date,
     },
     lastLogin: {
       type: Schema.Types.Date,
@@ -68,7 +72,7 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: Schema.Types.String,
-      enum: ['user', 'writer', 'admin'],
+      enum: ['user', 'writer'],
       default: 'user',
     },
     passwordChangedAt: {
@@ -80,9 +84,9 @@ const userSchema = mongoose.Schema(
     passwordResetExpires: {
       type: Schema.Types.Date,
     },
-    posts: [
+    blogs: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Post',
       },
     ],
@@ -92,7 +96,7 @@ const userSchema = mongoose.Schema(
       select: false,
     },
   },
-  { timeStamps: true }
+  { timestamps: true }
 );
 
 userSchema.pre('save', async function (next) {

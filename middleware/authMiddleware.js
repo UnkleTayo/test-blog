@@ -1,4 +1,3 @@
-const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const expressAsyncHandler = require('express-async-handler');
 const AppError = require('../utils/appErrorHandler');
@@ -12,7 +11,7 @@ exports.protect = expressAsyncHandler(async (req, res, next) => {
 
     if (!token) {
       return next(
-        new AppError('You are not logged in, please login to get access', 401)
+        new AppError('You are not authorized to access this route', 401)
       );
     }
 
@@ -29,7 +28,9 @@ exports.protect = expressAsyncHandler(async (req, res, next) => {
         new AppError('User recently changed password,Please login again', 401)
       );
     }
+
     req.user = freshUser;
+   
     // verify jwt
     freshUser.changedPasswordAfter(decodedData.iat);
     next();
@@ -38,6 +39,8 @@ exports.protect = expressAsyncHandler(async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
   return expressAsyncHandler(async (req, res, next) => {
+    console.log(roles)
+    console.log(req.user.role)
     // roles is an array
     if (!roles.includes(req.user.role)) {
       return next(

@@ -1,29 +1,24 @@
 const express = require('express');
 const userController = require('../controllers/userController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-router.patch('/updateMe', protect, userController.updateMe);
-router.delete('/deleteMe', protect, userController.deleteMe);
-router
-  .route('/')
-  .post(userController.createUser)
-  .get(userController.getUser)
-  .get(userController.getAllUsers);
+const roles = ["user", "admin"]
+router.patch('/updateMe', protect, restrictTo(...roles), userController.updateMe);
+router.delete('/deleteMe', protect, restrictTo(...roles),userController.deleteMe);
+
+router.get('/:id',protect, restrictTo(...roles), userController.getUser);
+router.get('/', protect, restrictTo("admin"),userController.getAllUsers);
 
 /**
  * Route to get post by a single user
  * Public
  * api/v1/user/post
  */
-router.get('/me/posts', userController.getUserPost);
+router.get('/me/:id/posts', userController.getUserPost);
 
-router
-  .route('/:id')
-  .get(userController.getUser)
-  .patch(userController.updateUser)
-  .delete(userController.deleteUser);
+router.route('/:id').get(userController.getUser);
 
 // user sign.addRoutes()
 module.exports = router;

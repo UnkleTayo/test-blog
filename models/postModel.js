@@ -1,3 +1,4 @@
+const { string } = require('joi');
 const mongoose = require('mongoose');
 const { titleToSlug } = require('../utils/urlSlug');
 
@@ -30,6 +31,14 @@ const postSchema = mongoose.Schema(
       maxlength: 200,
       trim: true,
     },
+    photo:{
+      type: Schema.Types.String,
+      required: false,
+    },
+    categories:{
+      type:Schema.Types.Array,
+      required: false,
+    },
     tags: [
       {
         type: Schema.Types.String,
@@ -45,7 +54,7 @@ const postSchema = mongoose.Schema(
       },
     ],
     status: {
-      type: String,
+      type: Schema.Types.String,
       enum: ['draft', 'published'],
       default: 'draft',
     },
@@ -53,10 +62,6 @@ const postSchema = mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
       index: true,
-    },
-    isPublished: {
-      type: Schema.Types.Boolean,
-      default: false,
     },
     publishedAt: {
       type: Schema.Types.Date,
